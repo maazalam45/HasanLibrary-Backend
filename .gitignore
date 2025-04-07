@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Build directories
+dist/
+build/
+
+# Dependency directories
+coverage/
+
+# .DS_Store files (for macOS)
+.DS_Store
+
+# Vscode or editor specific files
+.vscode/
