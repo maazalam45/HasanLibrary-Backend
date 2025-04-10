@@ -160,6 +160,13 @@ export const verifyOtp = async (req, res) => {
             { expiresIn: "7d" }
         );
 
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "None",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
         res.status(200).json({ message: "OTP verified", token });
     } catch (error) {
         console.log(error);
@@ -190,6 +197,13 @@ export const loginUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "None",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
 
         res.status(200).json({
             message: "User logged in successfully!",
@@ -288,5 +302,25 @@ export const resetPassword = async (req, res) => {
         res.status(200).json({ message: "Password reset successful" });
     } catch (err) {
         res.status(400).json({ message: "Invalid or expired token" });
+    }
+};
+
+export const logoutUser = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const getUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };

@@ -6,6 +6,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 
 connectDB();
 
