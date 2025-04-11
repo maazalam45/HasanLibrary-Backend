@@ -39,7 +39,6 @@ export const getBookById = async (req, res) => {
     }
 };
 
-
 export const updateBook = async (req, res) => {
     try {
         const { title, author, isbn, category, copiesAvailable } = req.body;
