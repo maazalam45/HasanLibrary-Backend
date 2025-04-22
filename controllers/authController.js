@@ -1,4 +1,3 @@
-
 import { User } from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
@@ -12,9 +11,14 @@ export const registerUser = async (req, res) => {
         const { name, email, password, role } = req.body;
 
         const checkExistingUser = await User.findOne({ email });
+        if (checkExistingUser && !checkExistingUser.isVerified) {
+            return res.status(409).json({ message: "OTP already sent to your Email" });
+        }
+
         if (checkExistingUser) {
             return res.status(409).json({ message: "Email already exists" });
         }
+
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -152,7 +156,7 @@ export const verifyOtp = async (req, res) => {
         await user.save();
 
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { id: user._id, role: user.role, tokenVersion: user.tokenVersion },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
@@ -190,7 +194,7 @@ export const loginUser = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: checkExistingUser._id, role: checkExistingUser.role },
+            { id: checkExistingUser._id, role: checkExistingUser.role, tokenVersion: checkExistingUser.tokenVersion },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
@@ -240,14 +244,14 @@ export const forgetPassword = async (req, res) => {
         checkExistingUser.resetPasswordToken = token;
         checkExistingUser.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-        const resetLink = `${process.env.LOCAL_URL}/api/user/resetPassword/${token}`
+        const resetLink = `${process.env.LOCAL_URL}api/authentication/resetPassword/${token}`
         const { subject, html } = forgetPassEmailTemplate(checkExistingUser.name, resetLink);
 
         try {
             await sendEmail(email, subject, null, html);
             await checkExistingUser.save();
 
-            res.status(201).json({ message: "OTP is sent to your email" });
+            res.status(201).json({ message: "Reset Link is sent to your email" });
         } catch (emailError) {
             console.error("Email sending failed:", emailError);
             res.status(500).json({ message: "Failed to send verification email" });
@@ -293,6 +297,7 @@ export const resetPassword = async (req, res) => {
 
         user.resetPasswordToken = null;
         user.resetPasswordExpires = null;
+        user.tokenVersion = user.tokenVersion + 1;
 
         await user.save();
 
@@ -302,13 +307,26 @@ export const resetPassword = async (req, res) => {
     }
 };
 
-export const logoutUser = (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: false,
-        sameSite: "None",
-    });
+export const logoutUser = async (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "None",
+        });
 
-    res.status(200).json({ message: "Logged out successfully" });
+        if (req.user) {
+            const user = await User.findById(req.user._id);
+            user.tokenVersion += 1;
+            await user.save();
+        };
+
+        res.status(200).json({ message: "Logged out successfully" });
+
+    }
+    catch (error) {
+        res.status(500).json({ message: "Logout failed", error: error.message });
+    }
+
 };
 
