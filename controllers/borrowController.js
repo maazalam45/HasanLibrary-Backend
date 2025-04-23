@@ -1,5 +1,5 @@
-import { Book } from "../models/Book";
-import { Borrow } from "../models/Borrow";
+import { Book } from "../models/Book.js";
+// import { Borrow } from "../models/Borrow.js";
 
 export const borrowBook = async (req, res) => {
     try {

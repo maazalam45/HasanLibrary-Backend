@@ -1,12 +1,14 @@
+import cloudinary from "../config/cloudinary.js";
 import { Book } from "../models/Book.js";
-
-
+import multer from "multer";
 
 export const registerBook = async (req, res) => {
     try {
-        const { title, author, isbn, category, copiesAvailable } = req.body;
+        const { title, author, isbn, category, copiesAvailable, } = req.body;
 
-        const newBook = new Book({ title, author, isbn, category, copiesAvailable });
+        const bookImage = req.file ? req.file.path : "No Image Available";
+
+        const newBook = new Book({ title, author, isbn, category, copiesAvailable, bookImage: bookImage });
 
         await newBook.save();
 
@@ -14,8 +16,13 @@ export const registerBook = async (req, res) => {
         res.status(201).json({ message: "Book registered successfully!" });
 
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error(error); // for debugging
+        res.status(500).json({
+            message: "Server error",
+            error: error.message, // ✅ Send readable message
+        });
     }
+
 };
 
 export const getBooks = async (req, res) => {
