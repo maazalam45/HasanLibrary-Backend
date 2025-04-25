@@ -49,3 +49,32 @@ export const deleteMyAccount = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const uploadProfileImage = async (req, res) => {
+    try {
+        const imageUrl = req.file?.path;
+
+        if (!imageUrl) {
+            return res.status(400).json({ message: "No image uploaded" });
+        }
+
+        const userId = req.user?._id;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized, no user found" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { profileImage: imageUrl },
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json({
+            message: "Profile image uploaded successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};

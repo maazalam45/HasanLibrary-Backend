@@ -55,11 +55,16 @@ export const updateBook = async (req, res) => {
             return res.status(404).json({ message: "Book not found" });
         }
 
+        const imageUrl = req.file?.path;
+
         book.title = title || book.title;
         book.author = author || book.author;
         book.isbn = isbn || book.isbn;
         book.category = category || book.category;
         book.copiesAvailable = copiesAvailable || book.copiesAvailable;
+        if (imageUrl) {
+            book.bookImage = imageUrl || book.bookImage;
+        }
 
         await book.save();
         res.json({ message: "Book updated successfully", book });

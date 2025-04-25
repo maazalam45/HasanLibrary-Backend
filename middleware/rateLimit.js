@@ -49,3 +49,13 @@ export const forgetPassLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+export const profileImageLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: {
+        message: "Too many Profile Update's. Please try again after an hour",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});

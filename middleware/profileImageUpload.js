@@ -6,13 +6,13 @@ import multer from "multer";
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: "LibraryBookImage",
+        folder: "ProfileImage",
         format: async (req, file) => file.mimetype.split("/")[1],
         public_id: async (req, file) => {
-            const isbn = req.body?.isbn?.trim() || null;
-            const uniqueId = uuidv4(); // Generate random unique ID
-            return isbn ? `book_${isbn}` : `book_${uniqueId}`;
-        },
+            const uid = req.user?._id || uuidv4(); // fallback if user not found
+            return `Profile_${uid}`;
+        }
+
     },
 });
 
