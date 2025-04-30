@@ -1,14 +1,12 @@
-import cloudinary from "../config/cloudinary.js";
 import { Book } from "../models/Book.js";
-import multer from "multer";
 
 export const registerBook = async (req, res) => {
     try {
-        const { title, author, isbn, category, copiesAvailable, } = req.body;
+        const { title, author, isbn, category, copiesAvailable, borrowPrice } = req.body;
 
         const bookImage = req.file ? req.file.path : "No Image Available";
 
-        const newBook = new Book({ title, author, isbn, category, copiesAvailable, bookImage: bookImage });
+        const newBook = new Book({ title, author, isbn, category, copiesAvailable, bookImage: bookImage, borrowPrice: Number(borrowPrice) });
 
         await newBook.save();
 
@@ -48,7 +46,7 @@ export const getBookById = async (req, res) => {
 
 export const updateBook = async (req, res) => {
     try {
-        const { title, author, isbn, category, copiesAvailable } = req.body;
+        const { title, author, isbn, category, copiesAvailable, borrowPrice } = req.body;
         const book = await Book.findById(req.params.id);
 
         if (!book) {
@@ -61,6 +59,7 @@ export const updateBook = async (req, res) => {
         book.author = author || book.author;
         book.isbn = isbn || book.isbn;
         book.category = category || book.category;
+        book.borrowPrice = Number(borrowPrice) || book.borrowPrice;
         book.copiesAvailable = copiesAvailable || book.copiesAvailable;
         if (imageUrl) {
             book.bookImage = imageUrl || book.bookImage;

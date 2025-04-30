@@ -7,11 +7,6 @@ logs
 npm-debug.log*
 
 # Environment files
-.env
-.env.local
-.env.development
-.env.production
-.env.test
 
 # Build directories
 dist/
@@ -25,3 +20,6 @@ coverage/
 
 # Vscode or editor specific files
 .vscode/
+config.bat
+temp_auto_push.bat
+temp_interactive_push.bat

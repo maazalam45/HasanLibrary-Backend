@@ -7,6 +7,7 @@ const bookSchema = new Schema({
     isbn: { type: String, required: true, unique: true },
     category: { type: String, required: true },
     copiesAvailable: { type: Number, required: true, min: 0 },
+    borrowPrice: { type: Number, required: true, min: 10, max: 10000 },
     bookImage: {
         type: String,
         default: "",

@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 const borrowSchema = new Schema({
     userId: { type: String, required: true },
     bookId: { type: String, required: true },
-    borrowDate: { type: Date, required: true },
+    borrowDate: { type: Date, default: Date.now, },
     returnDate: { type: Date, required: true },
     status: {
         type: String,
